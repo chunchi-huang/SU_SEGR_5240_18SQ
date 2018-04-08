@@ -220,6 +220,7 @@ namespace restapi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(InvalidStateError), 409)]
         [ProducesResponseType(typeof(EmptyTimecardError), 409)]
+        [ProducesResponseType(typeof(InvalidOperationError), 409)]
         public IActionResult Submit(string id, [FromBody] Submittal submittal)
         {
             Timecard timecard = Database.Find(id);
@@ -234,6 +235,11 @@ namespace restapi.Controllers
                 if (timecard.Lines.Count < 1)
                 {
                     return StatusCode(409, new EmptyTimecardError() { });
+                }
+
+                if (submittal.Resource != timecard.Resource)
+                {
+                    return StatusCode(409, new InvalidOperationError() { });
                 }
                 
                 var transition = new Transition(submittal, TimecardStatus.Submitted);
@@ -283,6 +289,7 @@ namespace restapi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(InvalidStateError), 409)]
         [ProducesResponseType(typeof(EmptyTimecardError), 409)]
+        [ProducesResponseType(typeof(InvalidOperationError), 409)]
         public IActionResult Cancel(string id, [FromBody] Cancellation cancellation)
         {
             Timecard timecard = Database.Find(id);
@@ -292,6 +299,11 @@ namespace restapi.Controllers
                 if (timecard.Status != TimecardStatus.Draft && timecard.Status != TimecardStatus.Submitted)
                 {
                     return StatusCode(409, new InvalidStateError() { });
+                }
+
+                if (cancellation.Resource != timecard.Resource)
+                {
+                    return StatusCode(409, new InvalidOperationError() { });
                 }
                 
                 var transition = new Transition(cancellation, TimecardStatus.Cancelled);
