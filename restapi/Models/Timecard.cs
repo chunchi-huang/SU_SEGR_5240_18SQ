@@ -10,6 +10,8 @@ namespace restapi.Models
     {
         public Timecard(int resource)
         {
+            this.Resource = resource;
+            Opened = DateTime.UtcNow;
             UniqueIdentifier = Guid.NewGuid();
             Identity = new TimecardIdentity();
             Lines = new List<AnnotatedTimecardLine>();
