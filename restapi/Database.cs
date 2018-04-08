@@ -28,10 +28,14 @@ namespace restapi
                 return null;
             }
         }
-
         public static void Add(Timecard timecard)
         {
             Timecards.Add(timecard.Identity.Value, timecard);
+        }
+
+        public static void Delete(Timecard timecard)
+        {
+            Timecards.Remove(timecard.Identity.Value);
         }
     }
 }
