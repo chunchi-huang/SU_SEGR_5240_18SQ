@@ -161,6 +161,41 @@ namespace restapi.Controllers
             }
         }
 
+        [HttpPatch("{id}/lines/{lineId}")]
+        [Produces(ContentTypes.TimesheetLines)]
+        [ProducesResponseType(typeof(AnnotatedTimecardLine), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(InvalidStateError), 409)]
+        public IActionResult UpdateLine(string id, string lineId, Nullable<int> week = null, Nullable<int> year = null,
+                                            Nullable<DayOfWeek> day = null, Nullable<float> hours = null, string project = null)
+        {
+        Timecard timecard = Database.Find(id);
+
+            if (timecard != null)
+            {
+                if (timecard.Status != TimecardStatus.Draft)
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
+
+                var annotatedLine = timecard.FindLine(new Guid(lineId));
+
+                if (annotatedLine != null)
+                {
+                    annotatedLine.UpdateLine(week, year, day, hours, project);
+                    return Ok(annotatedLine);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpGet("{id}/transitions")]
         [Produces(ContentTypes.Transitions)]
         [ProducesResponseType(typeof(IEnumerable<Transition>), 200)]

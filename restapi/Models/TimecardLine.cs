@@ -48,6 +48,49 @@ namespace restapi.Models
             workDate = FirstDateOfWeekISO8601(line.Year, line.Week).AddDays((int)line.Day - 1);
         }
 
+        public void UpdateLine(Nullable<int> week, Nullable<int> year, Nullable<DayOfWeek> day, Nullable<float> hours, string project)
+        {
+            bool isNeedUpdateWorkDate = false;
+
+            if (week.HasValue)
+            {
+              this.Week = week.Value;
+
+              isNeedUpdateWorkDate = true;
+            }
+
+            if (year.HasValue)
+            {
+              this.Year = year.Value;
+
+              isNeedUpdateWorkDate = true;
+            }
+
+            if (day.HasValue)
+            {
+              this.Day = day.Value;
+
+              isNeedUpdateWorkDate = true;
+            }
+
+            if (hours.HasValue)
+            {
+              this.Hours = hours.Value;
+            }
+
+            if (project != null)
+            {
+                this.Project = project;
+            }
+
+            Recorded = DateTime.UtcNow;
+
+            if (isNeedUpdateWorkDate)
+            {
+                workDate = FirstDateOfWeekISO8601(this.Year, this.Week).AddDays((int)this.Day - 1);
+            }
+        }
+
         public DateTime Recorded { get; set; }
 
         public string WorkDate { get => workDate.ToString("yyyy-MM-dd"); }
