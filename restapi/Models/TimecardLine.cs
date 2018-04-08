@@ -36,6 +36,18 @@ namespace restapi.Models
             UniqueIdentifier = Guid.NewGuid();
         }
 
+        public void ReplaceLine(TimecardLine line)
+        {
+            Week = line.Week;
+            Year = line.Year;
+            Day = line.Day;
+            Hours = line.Hours;
+            Project = line.Project;
+
+            Recorded = DateTime.UtcNow;
+            workDate = FirstDateOfWeekISO8601(line.Year, line.Week).AddDays((int)line.Day - 1);
+        }
+
         public DateTime Recorded { get; set; }
 
         public string WorkDate { get => workDate.ToString("yyyy-MM-dd"); }
