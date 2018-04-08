@@ -353,6 +353,7 @@ namespace restapi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(InvalidStateError), 409)]
         [ProducesResponseType(typeof(EmptyTimecardError), 409)]
+        [ProducesResponseType(typeof(InvalidOperationError), 409)]
         public IActionResult Close(string id, [FromBody] Rejection rejection)
         {
             Timecard timecard = Database.Find(id);
@@ -363,10 +364,17 @@ namespace restapi.Controllers
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
-                
-                var transition = new Transition(rejection, TimecardStatus.Rejected);
-                timecard.Transitions.Add(transition);
-                return Ok(transition);
+
+                if (rejection.Resource == timecard.Resource)
+                {
+                    return StatusCode(409, new InvalidOperationError() { });
+                }
+                else
+                {
+                    var transition = new Transition(rejection, TimecardStatus.Rejected);
+                    timecard.Transitions.Add(transition);
+                    return Ok(transition);
+                }
             }
             else
             {
@@ -411,6 +419,7 @@ namespace restapi.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(InvalidStateError), 409)]
         [ProducesResponseType(typeof(EmptyTimecardError), 409)]
+        [ProducesResponseType(typeof(InvalidOperationError), 409)]
         public IActionResult Approve(string id, [FromBody] Approval approval)
         {
             Timecard timecard = Database.Find(id);
@@ -421,10 +430,17 @@ namespace restapi.Controllers
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
-                
-                var transition = new Transition(approval, TimecardStatus.Approved);
-                timecard.Transitions.Add(transition);
-                return Ok(transition);
+
+                if (approval.Resource == timecard.Resource)
+                {
+                    return StatusCode(409, new InvalidOperationError() { });
+                }
+                else
+                {
+                    var transition = new Transition(approval, TimecardStatus.Approved);
+                    timecard.Transitions.Add(transition);
+                    return Ok(transition);
+                }
             }
             else
             {
